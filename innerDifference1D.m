@@ -10,7 +10,7 @@ function D = innerDifference1D(points)
 %   D: The inner difference matrix
 
 % Setup the matrix
-numPoints = size(points, 2);
+numPoints = length(points);
 D = zeros(numPoints - 1, numPoints - 2);
 
 % Boundary conditions

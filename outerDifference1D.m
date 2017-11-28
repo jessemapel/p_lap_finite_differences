@@ -10,7 +10,7 @@ function D = outerDifference1D(points)
 %   D: The outer difference matrix
 
 % Setup the matrix
-numPoints = size(points, 2);
+numPoints = length(points, 2);
 D = zeros(numPoints - 2, numPoints - 1);
 
 % Fill the matrix

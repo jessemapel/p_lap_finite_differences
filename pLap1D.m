@@ -21,6 +21,36 @@ function [ lambda, u, iterations ] = pLap1D( p, maxIterations, points, ...
 %   iterations: The number of iterations taken
 
 % Create difference matrices
+D_in = innerDifference1D(points);
+D_out = outerDifference1D(points);
+
+
+end
+
+function [G] = objectFunc(u, lambda, p, D_in, D_out, points)
+%objectFunc Computes the object function
+
+% compute several things for later
+numPoints = length(points);
+u_abs = abs(u);
+
+% compute the p-Laplacian
+u_in = D_in * u;
+u_lap = D_out * (abs(u_in).^(p-2) .* u_in);
+
+% compute the norm
+dist = (points(2:end) - points(1:end-1));
+trap = spdiags([dist dist], [-1, 0], numPoints - 1, numPoints - 2);
+u_norm = sum(trap * (u_abs .^ p)) / (p * 2);
+
+% put together the object function
+G = [u_lap + lambda * u_abs.^(p-2) .* u;
+     u_norm];
+
+end
+
+function [J] = jacobianFunc(u, lambda, p, D_in, D_out, points)
+%jacobianFunc Compute the Jacobian of the object function
 
 
 end
