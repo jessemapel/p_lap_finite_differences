@@ -24,6 +24,24 @@ function [ lambda, u, iterations ] = pLap1D( p, maxIterations, points, ...
 D_in = innerDifference1D(points);
 D_out = outerDifference1D(points);
 
+% Create the object function and jacobian functions
+obj_func = @(v)objectFunction(v,p,D_in,D_out,points);
+jac_func = @(v)jacobianFunction(v,p,D_in,D_out,points);
+converge_func = @(v) norm(v(1:end-1)) < threshold;
+
+% Use Laplacian eigenvalue and function as initial guess
+[V, D] = eigs(D_out * D_in, startNumber, 'sm');
+u_0 = [V(:, startNumber);
+       D(startNumber, startNumber)];
+
+% Do Newton's Method
+[ u_final, iterations ] = iterativeNewton(u_0, maxIterations, obj_func, jac_func, converge_func);
+
+u = u_final(1:end-1)
+lambda = u_final(end)
+
+u_final(end)
+plot(points, [0; u_final(1:end-1); 0])
 
 end
 
