@@ -31,17 +31,17 @@ converge_func = @(v) norm(v(1:end-1)) < threshold;
 
 % Use Laplacian eigenvalue and function as initial guess
 [V, D] = eigs(D_out * D_in, startNumber, 'sm');
-u_0 = [V(:, startNumber);
+scale = ( p/trapz(points(2:end-1), abs(V(:, startNumber)).^p) )^(1/p);
+u_0 = [scale * V(:, startNumber);
        D(startNumber, startNumber)];
 
 % Do Newton's Method
 [ u_final, iterations ] = iterativeNewton(u_0, maxIterations, obj_func, jac_func, converge_func);
 
-u = u_final(1:end-1)
-lambda = u_final(end)
+u = u_final(1:end-1);
+lambda = u_final(end);
 
-u_final(end)
-plot(points, [0; u_final(1:end-1); 0])
+plot(points, [0; u; 0])
 
 end
 
