@@ -41,7 +41,5 @@ u_0 = [scale * V(:, startNumber);
 u = u_final(1:end-1);
 lambda = u_final(end);
 
-plot(points, [0; u; 0])
-
 end
 
