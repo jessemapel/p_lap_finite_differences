@@ -15,7 +15,7 @@ function D = innerDifference2D(vertices, bounds, triangles)
 %       the jth triangle.
 %
 % Outputs:
-%   D: The inner difference matrix
+%   D: The inner difference matrix.
 
 % Setup
 % Keep the x and y derivative matrices separate for ease of indexing
