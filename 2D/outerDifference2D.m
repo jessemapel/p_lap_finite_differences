@@ -41,9 +41,12 @@ for index = 1:numVertices
         degree = 1;
     end
     
-    observations = zeros(numAdjacent, degree*3);
-    for triangle = adjacentTriangles'
-        verts = vertices(triangles(triangle,:),:);
+    observations = zeros(numAdjacent,degree*3);
+    for triangle = 1:numAdjacent
+        verts = vertices(triangles(adjacentTriangles(triangle),:),:);
+        if index==121
+            verts
+        end
         midPoint = sum(verts)./3;
         observation = zeros(1, degree*3);
         observation(1) = 1;
@@ -75,7 +78,7 @@ Dx(boundVertices,:) = [];
 Dy(boundVertices,:) = [];
 
 % Make the matrix sparse for efficiency
-D = sparse([Dx; Dy]);
+D = sparse([Dx Dy]);
 
 end
 

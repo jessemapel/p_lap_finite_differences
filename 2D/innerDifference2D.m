@@ -43,7 +43,7 @@ Dx(:,boundVertices) = [];
 Dy(:,boundVertices) = [];
 
 % Make the matrix sparse for efficiency
-D = sparse([Dx Dy]);
+D = sparse([Dx; Dy]);
 
 end
 
