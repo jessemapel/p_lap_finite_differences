@@ -29,40 +29,46 @@ Dy = zeros(numVertices, numTriangles);
 % then compute the derivative that way.
 % If there are not enough adjacent triangles, then fit a plane.
 for index = 1:numVertices
+    if ismember(index,bounds)
+        continue
+    end
     [adjacentTriangles,~] = find(triangles==index);
     numAdjacent = size(adjacentTriangles,1);
-    
+    vertex = vertices(index,:);
     degree = 2;
-    if numAdjacent < 3
-        % If there are less than three adjacent triangles,
-        % then the vertex is on the boundary and can be skipped.
-        continue;
-    elseif numAdjacent < 6
+    if numAdjacent < 6
         degree = 1;
     end
     
     observations = zeros(numAdjacent,degree*3);
-    for triangle = 1:numAdjacent
-        verts = vertices(triangles(adjacentTriangles(triangle),:),:);
-        if index==121
-            verts
-        end
+    weightVec = zeros(1,numAdjacent);
+    for triIndex = 1:numAdjacent
+        triangle = triangles(adjacentTriangles(triIndex),:);
+        verts = vertices(triangle,:);
         midPoint = sum(verts)./3;
-        observation = zeros(1, degree*3);
-        observation(1) = 1;
-        observation([2, 3]) = midPoint;
+        observations(triIndex,1) = 1;
+        observations(triIndex,[2, 3]) = midPoint;
         if (degree == 2)
-            observation([4, 5]) = midPoint.^2;
-            observation(6) = midPoint(1)*midPoint(2);
+            observations(triIndex,[4, 5]) = midPoint.^2;
+            observations(triIndex,6) = midPoint(1)*midPoint(2);
         end
-        observations(triangle,:) = observation;
+        
+        adjacentVerts = find(triangle~=index);
+        legOne = verts(adjacentVerts(1),:)-vertex;
+        legTwo = verts(adjacentVerts(2),:)-vertex;
+        weightVec(triIndex) = atan2(norm(legOne(2)*legTwo(1)- legOne(1)*legTwo(2)),dot(legOne,legTwo));
     end
-    
-    solution = (observations'*observations)\(observations');
+    normalMatrix = observations'*diag(weightVec)*observations;
+    % If the normal matrix is close to uninvertible, fit a plane
+    if and(rcond(normalMatrix) < 1e-7, degree > 1)
+        degree = 1;
+        observations(:,4:end) = [];
+        normalMatrix = observations'*diag(weightVec)*observations;
+    end
+    solution = normalMatrix\(observations'*diag(weightVec));
     Dx(index,adjacentTriangles) = solution(2,:);
     Dy(index,adjacentTriangles) = solution(3,:);
     if (degree == 2)
-        vertex = vertices(index,:);
         Dx(index,adjacentTriangles) = Dx(index,adjacentTriangles)...
                                     + 2*vertex(1)*solution(4,:)...
                                     + vertex(2)*solution(6,:);
