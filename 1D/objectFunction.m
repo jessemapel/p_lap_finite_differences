@@ -11,10 +11,10 @@ u_in = D_in * u;
 u_lap = D_out * (abs(u_in).^(p-2) .* u_in);
 
 % compute the norm
-u_norm = trapz(points(2:end-1), (u_abs .^ p)) / p - 1;
+u_norm = trapz(points(2:end-1), (u_abs .^ p)) / p;
 
 % put together the object function
 G = [u_lap + lambda * u_abs.^(p-2) .* u;
-     u_norm];
+     u_norm - 1];
 end
 
